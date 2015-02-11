@@ -55,7 +55,7 @@ define(['require'], function (require) {
             .data(dataset)
             .enter()
             .append('circle')
-            .attr('r', function (d) {return 3})
+            .attr('r', 3)
             .attr('cx', function (d, i) {
                 return d.x
             })

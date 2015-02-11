@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title></title>
+    </head>
+    <body>
+
+        <script src="http://style.c.aliimg.com/fdevlib/js/gallery/jquery/jquery-latest.js"></script>
+        <script src="http://style.c.aliimg.com/fdevlib/js/lofty/port/lofty.js"></script>
+        <!--[if lte IE 8]>
+        <!--<script src="./bower_components/r2d3/r2d3.js" charset="utf-8"></script>-->
+        <![endif]-->
+        <!--[if gte IE 9]><!-->
+        <script src="./bower_components/d3/d3.min.js"></script>
+        <!--<![endif]-->
+        <script>
+            var nodes = d3.select("body").selectAll("div").data([4, 8, 15, 16, 23, 42])
+            nodes.enter()
+                    .append("div")
+                    .text(function (d) { return d; })
+                    .attr('data-1', function (d, i) { return i })
+            nodes.exit()
+
+            var div = d3.select("body").selectAll("div")
+                    .data([1, 2, 4, 8, 16, 32], function (d) { return d; });
+            div.enter().append("div")
+                    .text(function (d) { return d + '`'; })
+                    .attr('data-2', function (d, i) { return i })
+            div.exit().remove()
+            //
+            //            d3.selectAll("div").attr("index", function (d, i) { return i; });
+        </script>
+    </body>
+</html>
