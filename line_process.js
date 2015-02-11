@@ -28,6 +28,27 @@ bar.enter().append('rect').attr({
     .transition()
     .attr({width: function (d) {return 400 * d}})
     .duration(1000)
+var text = svg.selectAll('text').data(data)
+text.enter().append('text').attr({
+    'class': 'text',
+    x: 0,
+    y: 16 + (40 - 16) / 2 - 1,
+    color: 'black',
+    width: 50
+})
+    .text(function (d) {
+        return getPercentage(d)
+    })
+    .transition()
+    .attr({
+        x: function (d) {
+            return 400 * d
+        }
+    })
+    .duration(1000)
+
+
+bar.exit()
     
 
 
