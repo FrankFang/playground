@@ -13,7 +13,7 @@ var line = svg.append('rect')
         height: 40,
         x: 0,
         y: 0,
-        fill: 'red'
+        fill: '#f2f2f2'
     })
 
 var bar = svg.selectAll('.bar').data(data)
@@ -23,7 +23,7 @@ bar.enter().append('rect').attr({
     height: 40,
     x: 0,
     y: 0,
-    fill: 'blue'
+    fill: '#ffcc00'
 })
     .transition()
     .attr({width: function (d) {return 400 * d}})
