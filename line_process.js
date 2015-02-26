@@ -50,7 +50,7 @@ text.enter().append('text').attr({
 
 
 bar.exit()
-    
+
 
 
 
