@@ -10862,6 +10862,9 @@ d3 = function() {
   })();
   function appendRaphael(parent) {
     var paper = Raphael(parent, 0, 0), svg = document.createElement("svg");
+      if(svg.currentStyle['overflow'] == 'visible'){
+          paper.canvas.style.overflow = 'visible'
+      }
     svg.style.display = "none";
     parent.appendChild(svg);
     return new R2D3Element(paper, svg);
