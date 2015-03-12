@@ -86,6 +86,18 @@ function lineProcess(_options) {
             y: padding.top,
             fill: '#f2f2f2'
         })
+        .on('mouseenter', function () {
+            d3.select(this.parentNode).select('.xxxx')
+                .attr({
+                    'fill-opacity': 1
+                })
+        })
+        .on('mouseleave', function () {
+            d3.select(this.parentNode).select('.xxxx')
+                .attr({
+                    'fill-opacity': 0
+                })
+        })
 
     var bar = container.selectAll('.bar').data(data)
     bar.enter().append('rect').attr({
@@ -146,7 +158,8 @@ function lineProcess(_options) {
                 return d.value * width
             },
             'font-size': 12,
-            'font-family': '微软雅黑'
+            'font-family': '微软雅黑',
+            'fill-opacity': 100
         })
         .text(function (d) {
             return d.label

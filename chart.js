@@ -36,12 +36,7 @@ define(['require'], function (require) {
         .attr('height', 400)
         .on('click', function () {
             var start = new Date()
-            //for (var i = 0; i < count; i++) {
-            //    for (var j = 0; j < 500; j++) {
-            //        dataset.push(generatePoint())
-            //    }
-            //}
-            var dataset = generatePoints(250)
+            var dataset = generatePoints(100)
             append(dataset, count)
             var end = new Date()
             count += 1
@@ -62,6 +57,36 @@ define(['require'], function (require) {
             .attr('cy', function (d, i) {
                 return d.y
             })
+            .style({
+                fill:function(d){
+                    if(d.x> 300){
+                        if(d.y > 200){
+                            return 'red'
+                        }else{
+                            return 'yellow'
+                        }
+                    }else{
+                        if(d.y > 200){
+                            return 'blue'
+                        }else{
+                            return 'green'
+                        }
+                    }
+                }
+            })
+            .on('mouseover',function(){
+                d3.select(this)
+                    .attr({
+                        r:5
+                    })
+            })
+            .on('mouseleave',function(){
+                d3.select(this)
+                    .attr({
+                        r:3
+                    })
+            })
+
     }
 
     function append(dataset, count) {
@@ -76,6 +101,35 @@ define(['require'], function (require) {
             })
             .attr('cy', function (d, i) {
                 return d.y
+            })
+            .style({
+                fill:function(d){
+                    if(d.x> 300){
+                        if(d.y > 200){
+                            return 'red'
+                        }else{
+                            return 'yellow'
+                        }
+                    }else{
+                        if(d.y > 200){
+                            return 'blue'
+                        }else{
+                            return 'green'
+                        }
+                    }
+                }
+            })
+            .on('mouseover',function(){
+                d3.select(this)
+                    .attr({
+                        r:5
+                    })
+            })
+            .on('mouseleave',function(){
+                d3.select(this)
+                    .attr({
+                        r:3
+                    })
             })
 
     }

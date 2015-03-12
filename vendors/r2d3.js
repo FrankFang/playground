@@ -160,7 +160,7 @@
   eve.toString = function() {
     return "You are running Eve " + version;
   };
-  typeof module != "undefined" && module.exports ? module.exports = eve : (typeof define != "undefined" && false) ? define("eve", [], function() {
+  typeof module != "undefined" && module.exports ? module.exports = eve : typeof define != "undefined" ? define("eve", [], function() {
     return eve;
   }) : glob.eve = eve;
 })(this);
@@ -2428,7 +2428,7 @@
       if (n == !!n) {
         return n;
       }
-      return pow(2, -10 * n) * math.sin((n - .075) * 2 * PI / .3) + 1;
+      return pow(2, -10 * n) * math.sin((n - .075) * (2 * PI) / .3) + 1;
     },
     bounce: function(n) {
       var s = 7.5625, p = 2.75, l;
@@ -6379,7 +6379,7 @@ if (!Object.create) {
           }).toJSON = d;
           try {
             c = q.stringify(0) === "0" && q.stringify(new Number()) === "0" && q.stringify(new String()) == '""' && q.stringify(l) === e && q.stringify(e) === e && q.stringify() === e && q.stringify(d) === "1" && q.stringify([ d ]) == "[1]" && q.stringify([ e ]) == "[null]" && q.stringify(k) == "null" && q.stringify([ e, l, k ]) == "[null,null,null]" && q.stringify({
-              A: [ d, i, false, k, "\0\b\n\f\r	" ]
+              A: [ d, i, false, k, "\x00\b\n\f\r	" ]
             }) == '{"A":[1,true,false,null,"\\u0000\\b\\n\\f\\r\\t"]}' && q.stringify(k, d) === "1" && q.stringify([ 1, 2 ], k, 1) == "[\n 1,\n 2\n]" && q.stringify(new Date(-864e13)) == '"-271821-04-20T00:00:00.000Z"' && q.stringify(new Date(864e13)) == '"+275760-09-13T00:00:00.000Z"' && q.stringify(new Date(-621987552e5)) == '"-000001-01-01T00:00:00.000Z"' && q.stringify(new Date(-1)) == '"1969-12-31T23:59:59.999Z"';
           } catch (f) {
             c = false;
@@ -6796,7 +6796,7 @@ d3 = function() {
       }
     }
   });
-  var d3_map_prefix = "\0", d3_map_prefixCode = d3_map_prefix.charCodeAt(0);
+  var d3_map_prefix = "\x00", d3_map_prefixCode = d3_map_prefix.charCodeAt(0);
   function d3_identity(d) {
     return d;
   }
@@ -7344,7 +7344,7 @@ d3 = function() {
       return x.toString(16).toUpperCase();
     },
     g: function(x, p) {
-      return x.toPrecision(p);
+      return p ? x.toPrecision(p) : x.toString();
     },
     e: function(x, p) {
       return x.toExponential(p);
@@ -8325,7 +8325,7 @@ d3 = function() {
         if (this.node() && this.node().paper) {
           return this.node().raphaelNode.attr(name);
         } else {
-          return window.getComputedStyle(this.node(), null).getPropertyValue(name);
+          return window.getComputedStylePropertyValue(this.node(), name);
         }
       }
       priority = "";
@@ -8337,14 +8337,22 @@ d3 = function() {
       if (this.paper) {
         this.removeStyleProperty(name);
       } else {
-        this.style.removeProperty(name);
+        if (this.style.removeProperty) {
+          this.style.removeProperty(name);
+        } else {
+          this.style.removeAttribute(name);
+        }
       }
     }
     function styleConstant() {
       if (this.paper) {
         this.setStyleProperty(name, value);
       } else {
-        this.style.setProperty(name, value, priority);
+        if (this.style.setProperty) {
+          this.style.setProperty(name, value, priority);
+        } else {
+          this.style[name] = value;
+        }
       }
     }
     function styleFunction() {
@@ -8353,13 +8361,21 @@ d3 = function() {
         if (this.paper) {
           this.removeStyleProperty(name);
         } else {
-          this.style.removeProperty(name);
+          if (this.style.removeProperty) {
+            this.style.removeProperty(name);
+          } else {
+            this.style.removeAttribute(name);
+          }
         }
       } else {
         if (this.paper) {
           this.setStyleProperty(name, x);
         } else {
-          this.style.setProperty(name, x, priority);
+          if (this.style.setProperty) {
+            this.style.setProperty(name, x, priority);
+          } else {
+            this.style[name] = x;
+          }
         }
       }
     }
@@ -8397,13 +8413,13 @@ d3 = function() {
         this.setAttribute("text", value);
       });
     }
-    return arguments.length < 1 ? this.node().textContent : this.each(typeof value === "function" ? function() {
+    return arguments.length < 1 ? this.node().innerText : this.each(typeof value === "function" ? function() {
       var v = value.apply(this, arguments);
-      this.textContent = v == null ? "" : v;
+      this.innerText = v == null ? "" : v;
     } : value == null ? function() {
-      this.textContent = "";
+      this.innerText = "";
     } : function() {
-      this.textContent = value;
+      this.innerText = value;
     });
   };
   d3_selectionPrototype.html = function(value) {
@@ -8896,7 +8912,11 @@ d3 = function() {
       if (this.raphaelNode) {
         this.removeStyleProperty(name);
       } else {
-        this.style.removeProperty(name);
+        if (this.style.removeProperty) {
+          this.style.removeProperty(name);
+        } else {
+          this.style.removeAttribute(name);
+        }
       }
     }
     return d3_transition_tween(this, "style." + name, value, function(b) {
@@ -8907,9 +8927,13 @@ d3 = function() {
             this.setStyleProperty(name, i(t), priority);
           });
         }
-        var a = d3_window.getComputedStyle(this, null).getPropertyValue(name), i;
+        var a = d3_window.getComputedStylePropertyValue(this, name), i;
         return a !== b && (i = interpolate(a, b), function(t) {
-          this.style.setProperty(name, i(t), priority);
+          if (this.style.setProperty) {
+            this.style.setProperty(name, i(t), priority);
+          } else {
+            this.style[name] = i(t);
+          }
         });
       }
       return b == null ? styleNull : (b += "", styleString);
@@ -8926,9 +8950,13 @@ d3 = function() {
       });
     }
     return this.tween("style." + name, function(d, i) {
-      var f = tween.call(this, d, i, d3_window.getComputedStyle(this, null).getPropertyValue(name));
+      var f = tween.call(this, d, i, d3_window.getComputedStylePropertyValue(this, name));
       return f && function(t) {
-        this.style.setProperty(name, f(t), priority);
+        if (this.style.setProperty) {
+          this.style.setProperty(name, f(t), priority);
+        } else {
+          this.style[name] = f(t);
+        }
       };
     });
   };
@@ -10549,7 +10577,8 @@ d3 = function() {
       this.raphaelNode = paper.path("Z");
       break;
 
-     case "IMG":
+     case "img":
+     case "image":
       this.raphaelNode = paper.image("#", 0, 0, 0, 0);
       break;
 
@@ -10563,7 +10592,6 @@ d3 = function() {
       break;
 
      case "svg":
-      this.raphaelNode = null;
       this.isSVG = true;
     }
     this.updateProperty("transform");
@@ -10572,6 +10600,28 @@ d3 = function() {
   R2D3Element.prototype._linePath = function() {
     var x1 = this.domNode.getAttribute("x1") || 0, x2 = this.domNode.getAttribute("x2") || 0, y1 = this.domNode.getAttribute("y1") || 0, y2 = this.domNode.getAttribute("y2") || 0;
     return [ "M", x1, " ", y1, "L", x2, " ", y2, "Z" ].join("");
+  };
+  R2D3Element.prototype._strokeDashArray = function(dashValue) {
+    var dasharray = {
+      "3 1": "-",
+      "1 1": ".",
+      "3 1 1 1": "-.",
+      "3 1 1 1 1 1": "-..",
+      "1 3": ". ",
+      "4 3": "- ",
+      "8 3": "--",
+      "4 3 1 3": "- .",
+      "8 3 1 3": "--.",
+      "8 3 1 3 1 3": "--.."
+    };
+    if (dashValue === undefined) {
+      dashValue = this.domNode.getAttribute("stroke-dasharray");
+    }
+    dashValue = dashValue ? dashValue.match(/\d+/g) : "";
+    if (dashValue.length) {
+      dashValue = dashValue.join(" ");
+    }
+    return dasharray[dashValue] || "";
   };
   R2D3Element.prototype.updateProperty = function(propertyName) {
     switch (propertyName) {
@@ -10655,6 +10705,10 @@ d3 = function() {
       this.raphaelNode.attr("path", this._linePath());
       break;
 
+     case "stroke-dasharray":
+      this.raphaelNode.attr("stroke-dasharray", this._strokeDashArray());
+      break;
+
      default:
       if (this.raphaelNode) {
         var value = this.domNode.style.getAttribute(propertyName) || this.domNode.currentStyle.getAttribute(propertyName) || this.domNode.getAttribute(propertyName);
@@ -10663,8 +10717,13 @@ d3 = function() {
     }
   };
   R2D3Element.prototype.updateCurrentStyle = function(name) {
+    function undash(name) {
+      return name.replace(/-\w/, function(match) {
+        return match.charAt(1).toUpperCase();
+      });
+    }
     function getValue(el, name, currentStyle) {
-      return el.style.getAttribute(name) || currentStyle.getAttribute(name) || el.getAttribute(name);
+      return el.style.getAttribute(name) || currentStyle.getAttribute(name) || el.getAttribute(name) || currentStyle.getAttribute(undash(name));
     }
     var currentStyle = this.domNode.currentStyle, el = this.domNode;
     if (this.isSVG) {
@@ -10682,7 +10741,7 @@ d3 = function() {
       "fill-opacity": getValue(el, "fill-opacity", currentStyle) || 1,
       opacity: getValue(el, "opacity", currentStyle) || 1,
       stroke: getValue(el, "stroke", currentStyle) || "none",
-      "stroke-dasharray": getValue(el, "stroke-dasharray", currentStyle),
+      "stroke-dasharray": this._strokeDashArray(getValue(el, "stroke-dasharray", currentStyle)),
       "stroke-linecap": getValue(el, "stroke-linecap", currentStyle) || "butt",
       "stroke-linejoin": getValue(el, "stroke-linejoin", currentStyle) || "miter",
       "stroke-miterlimit": getValue(el, "stroke-miterlimit", currentStyle) || 4,
@@ -10804,7 +10863,7 @@ d3 = function() {
     }
     this.domNode.insertBefore(domNode, beforeDomNode);
     r2D3Element = domNode.r2d3 || new R2D3Element(this.paper, domNode);
-    if (before) {
+    if (before && r2D3Element.domNode.tagName !== "g") {
       r2D3Element.raphaelNode.insertBefore(before.raphaelNode);
     }
     return r2D3Element;
@@ -10839,7 +10898,7 @@ d3 = function() {
         } else {
           var camelCasedCssProperty = getCamelCasedCssProperty(cssProperty);
           if (el.currentStyle) {
-            return el.currentStyle(camelCasedCssProperty);
+            return el.currentStyle[camelCasedCssProperty];
           } else {
             return el.style[camelCasedCssProperty];
           }
@@ -10850,7 +10909,7 @@ d3 = function() {
     };
     function getCamelCasedCssProperty(cssProperty) {
       return cssProperty.replace(/-([a-z])/g, function(g) {
-        return g[1].toUpperCase();
+        return g.charAt(1).toUpperCase();
       });
     }
   })(this);
@@ -10862,9 +10921,7 @@ d3 = function() {
   })();
   function appendRaphael(parent) {
     var paper = Raphael(parent, 0, 0), svg = document.createElement("svg");
-      if(!svg.currentStyle || svg.currentStyle['overflow'] == 'visible'){
-          paper.canvas.style.overflow = 'visible'
-      }
+    paper.canvas.style.overflow = "visible";
     svg.style.display = "none";
     parent.appendChild(svg);
     return new R2D3Element(paper, svg);
