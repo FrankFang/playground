@@ -20,7 +20,6 @@ var getD = function (cx, cy, startArc, arc, r1, r2) {
         "A", r1, r1, '0', arc > 180 ? 1 : 0, '1', cx + r1 * cos(startArc).toFixed(6), cy - r1 * sin(startArc).toFixed(6)
     ].join(' ')
 }
-var start = new Date()
 var data = [0.15, 0.85]
 var svg = d3.select('body').append('svg').attr({width: 400, height: 400})
 var path = svg.selectAll('path').data(data)
@@ -39,4 +38,3 @@ path.enter()
             return colors[i]
         }
     })
-var end = new Date()
