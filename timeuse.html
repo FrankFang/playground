@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="http://style.c.aliimg.com/fdevlib/js/gallery/jquery/jquery-latest.js"></script>
+    <script src="http://assets.1688.com/vendor/d3/d3.min.js"></script>
+    <style>
+        rect.bordered {
+            stroke: #E6E6E6;
+            stroke-width: 2px;
+        }
+        
+        text.mono {
+            font-size: 9pt;
+            font-family: Consolas, courier;
+            fill: #aaa;
+        }
+        
+        text.axis-workweek {
+            fill: #000;
+        }
+        
+        text.axis-worktime {
+            fill: #000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chart"></div>
+
+    <script>
+
+        function timeuse(_options) {
+            var defaultOptions = {
+                width: 400,
+                height: 100,
+                margin: {
+                    top: 20,
+                    right: 20,
+                    bottom: 30,
+                    left: 20
+                },
+                container: undefined
+            }
+
+            var options = $.extend(true, {}, defaultOptions, _options)
+
+            function getColor(percentage) {
+                if (isNaN(percentage)) {
+                    return 'hsl(' + 128 + ', 100%, 60%)'
+                }
+                var h = 128 * (1 - percentage)
+                return 'hsl(' + h + ', 100%, 60%)'
+            }
+            var data = options.data
+            var margin = options.margin
+            var outerWidth = options.width
+            var outerHeight = options.height
+            var innerWidth = outerWidth - margin.left - margin.right
+            var innerHeight = outerHeight - margin.top - margin.bottom
+            var svg = d3.select(options.container).append('svg').attr({
+                width: outerWidth,
+                height: outerHeight
+            }).append('g').attr({
+                transform: 'translate(' + margin.left + ',' + margin.top + ')'
+            })
+
+            var gridCount = 24
+            var gridSize = innerWidth / gridCount
+            var max = d3.max(data)
+
+
+            var rect = svg.selectAll('rect').data(data)
+
+            var tooltip
+
+            rect.enter().append('rect').attr({
+                width: gridSize,
+                height: gridSize,
+                x: function(d, i) {
+                    return gridSize * i
+                },
+                y: 0,
+                fill: function(d) {
+                    return getColor(d / max)
+                }
+            }).on('mouseenter', function(d) {
+                tooltip = svg.append('text').attr({
+                    y: d3.event.y,
+                    x: d3.event.x,
+                    'text-anchor': 'middle'
+                }).text(d)
+            }).on('mouseleave', function(d) {
+                tooltip.remove()
+            })
+
+
+            var axis = svg.append('g').attr({
+                transform: 'translate(0,-5)'
+            })
+
+            var text = axis.selectAll('text').data(data)
+
+            text.enter().append('text').attr({
+                x: function(d, i) {
+                    return gridSize * i
+                },
+                'font-size': 10,
+                'text-anchor': 'middle'
+            }).text(function(d, i) {
+                if (i % 4 == 0) {
+                    return i + ':00'
+                }
+            })
+
+            var line = axis.selectAll('line').data(data)
+
+            line.enter().append('line').attr({
+                x1: function(d, i) {
+                    return gridSize * i
+                },
+                x2: function(d, i) {
+                    return gridSize * i
+                },
+                y1: 0,
+                y2: 5,
+                stroke: 'black',
+                visibility: function(d, i) {
+                    return i % 4 === 0 ? 'visible' : 'hidden'
+                }
+            })
+        }
+        timeuse({
+            //data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4],
+            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 9, 0, 1, 2, 3, 4],
+            container: '.chart'
+        })
+    </script>
+</body>
+
+</html>
